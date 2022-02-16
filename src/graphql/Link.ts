@@ -1,4 +1,4 @@
-import { extendType, objectType } from "nexus";
+import { extendType, objectType, nonNull, stringArg, intArg } from "nexus";
 import { NexusGenObjects } from "../../nexus-typegen";
 
 export const Link = objectType({
@@ -38,6 +38,106 @@ export const LinkQuery = extendType({
       // Resolver is implementation of GraphQL field
       resolve(parent, args, context, info) {
         return links;
+      },
+    });
+  },
+});
+
+/*
+  This generates 
+  type Mutation {
+    post(description: String!, url: String!): Link!
+  }
+
+  Can pass in variables like 
+  mutation Post($description: String!, $url: String!) {
+    post(description: $description, url: $url) {
+      id
+      url
+      description
+    }
+  }
+*/
+export const LinkMutation = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.nonNull.field("post", {
+      type: "Link",
+      args: {
+        description: nonNull(stringArg()),
+        url: nonNull(stringArg()),
+      },
+
+      resolve(parent, args, context) {
+        const { description, url } = args;
+
+        const link = {
+          id: links.length + 1,
+          description,
+          url,
+        };
+        links.push(link);
+        return link;
+      },
+    });
+
+    t.nonNull.field("updateLink", {
+      type: "Link",
+      args: {
+        id: nonNull(intArg()),
+        url: stringArg(),
+        description: stringArg(),
+      },
+
+      resolve(parent, args, context) {
+        const { id, url = "", description = "" } = args;
+        let updatedLink = {
+          id,
+          url: url ?? "",
+          description: description ?? "",
+        };
+        links = links.map((link) => {
+          if (link.id === id) {
+            updatedLink = {
+              id,
+              url: updatedLink.url ?? link.url,
+              description: updatedLink.description ?? link.description,
+            };
+            return updatedLink;
+          }
+          return link;
+        });
+        return updatedLink;
+      },
+    });
+
+    t.nonNull.field("deleteLink", {
+      type: "Link",
+      args: {
+        id: nonNull(intArg()),
+      },
+
+      resolve(parent, args, context) {
+        const { id } = args;
+
+        let deletedLink = {
+          id,
+          url: "",
+          description: "",
+        };
+        links = links.filter((link) => {
+          if (link.id === id) {
+            deletedLink = {
+              ...deletedLink,
+              url: link.url,
+              description: link.description,
+            };
+          }
+
+          return link.id !== id;
+        });
+
+        return deletedLink;
       },
     });
   },

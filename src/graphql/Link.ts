@@ -10,18 +10,18 @@ export const Link = objectType({
   },
 });
 
-let links: NexusGenObjects["Link"][] = [
-  {
-    id: 1,
-    url: "www.howtographql.com",
-    description: "Fullstack tutorial for GraphQL",
-  },
-  {
-    id: 2,
-    url: "graphql.org",
-    description: "GraphQL official website",
-  },
-];
+// let links: NexusGenObjects["Link"][] = [
+//   {
+//     id: 1,
+//     url: "www.howtographql.com",
+//     description: "Fullstack tutorial for GraphQL",
+//   },
+//   {
+//     id: 2,
+//     url: "graphql.org",
+//     description: "GraphQL official website",
+//   },
+// ];
 
 /*
   This generates 
@@ -37,7 +37,8 @@ export const LinkQuery = extendType({
       type: "Link",
       // Resolver is implementation of GraphQL field
       resolve(parent, args, context, info) {
-        return links;
+        // return links;
+        return context.prisma.link.findMany();
       },
     });
   },
@@ -69,76 +70,84 @@ export const LinkMutation = extendType({
       },
 
       resolve(parent, args, context) {
-        const { description, url } = args;
+        // const { description, url } = args;
+        // const link = {
+        //   id: links.length + 1,
+        //   description,
+        //   url,
+        // };
+        // links.push(link);
+        // return link;
 
-        const link = {
-          id: links.length + 1,
-          description,
-          url,
-        };
-        links.push(link);
-        return link;
-      },
-    });
-
-    t.nonNull.field("updateLink", {
-      type: "Link",
-      args: {
-        id: nonNull(intArg()),
-        url: stringArg(),
-        description: stringArg(),
-      },
-
-      resolve(parent, args, context) {
-        const { id, url = "", description = "" } = args;
-        let updatedLink = {
-          id,
-          url: url ?? "",
-          description: description ?? "",
-        };
-        links = links.map((link) => {
-          if (link.id === id) {
-            updatedLink = {
-              id,
-              url: updatedLink.url ?? link.url,
-              description: updatedLink.description ?? link.description,
-            };
-            return updatedLink;
-          }
-          return link;
+        // Apollo automatically resolves Promise objects returned from resolver functions
+        const newLink = context.prisma.link.create({
+          data: {
+            description: args.description,
+            url: args.url,
+          },
         });
-        return updatedLink;
+        return newLink;
       },
     });
 
-    t.nonNull.field("deleteLink", {
-      type: "Link",
-      args: {
-        id: nonNull(intArg()),
-      },
+    // t.nonNull.field("updateLink", {
+    //   type: "Link",
+    //   args: {
+    //     id: nonNull(intArg()),
+    //     url: stringArg(),
+    //     description: stringArg(),
+    //   },
 
-      resolve(parent, args, context) {
-        const { id } = args;
+    //   resolve(parent, args, context) {
+    //     const { id, url = "", description = "" } = args;
+    //     let updatedLink = {
+    //       id,
+    //       url: url ?? "",
+    //       description: description ?? "",
+    //     };
+    //     links = links.map((link) => {
+    //       if (link.id === id) {
+    //         updatedLink = {
+    //           id,
+    //           url: updatedLink.url ?? link.url,
+    //           description: updatedLink.description ?? link.description,
+    //         };
+    //         return updatedLink;
+    //       }
+    //       return link;
+    //     });
+    //     return updatedLink;
+    //   },
+    // });
 
-        let deletedLink = {
-          id,
-          url: "",
-          description: "",
-        };
-        links = links.filter((link) => {
-          if (link.id === id) {
-            deletedLink = {
-              ...deletedLink,
-              url: link.url,
-              description: link.description,
-            };
-          }
+    // t.nonNull.field("deleteLink", {
+    //   type: "Link",
+    //   args: {
+    //     id: nonNull(intArg()),
+    //   },
 
-          return link.id !== id;
-        });
+    //   resolve(parent, args, context) {
+    //     const { id } = args;
 
-        return deletedLink;
-      },
-    });
+    //     let deletedLink = {
+    //       id,
+    //       url: "",
+    //       description: "",
+    //     };
+    //     links = links.filter((link) => {
+    //       if (link.id === id) {
+    //         deletedLink = {
+    //           ...deletedLink,
+    //           url: link.url,
+    //           description: link.description,
+    //         };
+    //       }
+
+    //       return link.id !== id;
+    //     });
+
+    //     return deletedLink;
+    //   },
+    // });
   },
 });

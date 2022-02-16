@@ -1,0 +1,31 @@
+{
+  "name": "ts-apollo-learning",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node-dev --transpile-only --no-notify --exit-child src/index.ts",
+    "generate": "ts-node --transpile-only src/schema.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alfredlucero/ts-apollo-learning.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alfredlucero/ts-apollo-learning/issues"
+  },
+  "homepage": "https://github.com/alfredlucero/ts-apollo-learning#readme",
+  "devDependencies": {
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "apollo-server": "^3.6.3",
+    "graphql": "^15.8.0",
+    "nexus": "^1.2.0"
+  }
+}

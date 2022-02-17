@@ -1,5 +1,4 @@
 import { extendType, objectType, nonNull, stringArg, intArg } from "nexus";
-import { NexusGenObjects } from "../../nexus-typegen";
 
 export const Link = objectType({
   name: "Link",
@@ -7,6 +6,7 @@ export const Link = objectType({
     t.nonNull.int("id");
     t.nonNull.string("description");
     t.nonNull.string("url");
+    t.nonNull.dateTime("createdAt");
     t.field("postedBy", {
       type: "User",
       resolve(parent, args, context) {

@@ -7,6 +7,14 @@ export const Link = objectType({
     t.nonNull.int("id");
     t.nonNull.string("description");
     t.nonNull.string("url");
+    t.field("postedBy", {
+      type: "User",
+      resolve(parent, args, context) {
+        return context.prisma.link
+          .findUnique({ where: { id: parent.id } })
+          .postedBy();
+      },
+    });
   },
 });
 
@@ -78,14 +86,22 @@ export const LinkMutation = extendType({
         // };
         // links.push(link);
         // return link;
+        const { description, url } = args;
+        const { userId } = context;
+
+        if (!userId) {
+          throw new Error("Cannot post without logging in.");
+        }
 
         // Apollo automatically resolves Promise objects returned from resolver functions
         const newLink = context.prisma.link.create({
           data: {
-            description: args.description,
-            url: args.url,
+            description,
+            url,
+            postedBy: { connect: { id: userId } },
           },
         });
+
         return newLink;
       },
     });
